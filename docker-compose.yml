@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: OrderManagementDb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+
+  api:
+    image: order-api
+    container_name: order-api-container
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    environment:
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=OrderManagementDb;Username=postgres;Password=postgres

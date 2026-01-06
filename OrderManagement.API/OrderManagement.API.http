@@ -1,0 +1,40 @@
+@OrderManagement.API_HostAddress = http://localhost:8080
+
+### Get all orders
+GET {{OrderManagement.API_HostAddress}}/api/orders
+Accept: application/json
+
+###
+
+### Get order by ID
+GET {{OrderManagement.API_HostAddress}}/api/orders/1
+Accept: application/json
+
+###
+
+### Create a new order
+POST {{OrderManagement.API_HostAddress}}/api/orders
+Content-Type: application/json
+
+{
+  "customerName": "John Doe",
+  "totalAmount": 150.50
+}
+
+###
+
+### Update an existing order
+PUT {{OrderManagement.API_HostAddress}}/api/orders/1
+Content-Type: application/json
+
+{
+  "customerName": "John Doe Updated",
+  "totalAmount": 200.75
+}
+
+###
+
+### Delete an order
+DELETE {{OrderManagement.API_HostAddress}}/api/orders/1
+
+###
