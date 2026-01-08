@@ -13,7 +13,7 @@ services:
     image: order-api
     container_name: order-api-container
     ports:
-      - "8080:8080"
+      - "8081:8081"
     depends_on:
       - postgres
     environment:
