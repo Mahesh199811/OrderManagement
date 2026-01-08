@@ -28,7 +28,7 @@ Add the following **Inbound Rules**:
 | Type | Protocol | Port Range | Source | Description |
 |------|----------|------------|--------|-------------|
 | SSH | TCP | 22 | Your IP | SSH access |
-| Custom TCP | TCP | 8080 | 0.0.0.0/0 | API access |
+| Custom TCP | TCP | 8081 | 0.0.0.0/0 | API access |
 | Custom TCP | TCP | 5432 | Your IP | PostgreSQL (optional) |
 | HTTP | TCP | 80 | 0.0.0.0/0 | HTTP (optional) |
 | HTTPS | TCP | 443 | 0.0.0.0/0 | HTTPS (optional) |
@@ -265,7 +265,7 @@ docker logs -f order-api-container
 
 Open your browser and navigate to:
 ```
-http://YOUR-EC2-PUBLIC-DNS:8080/swagger
+http://YOUR-EC2-PUBLIC-DNS:8081/swagger
 ```
 
 Replace `YOUR-EC2-PUBLIC-DNS` with your actual EC2 public DNS or IP address.
@@ -275,7 +275,7 @@ Replace `YOUR-EC2-PUBLIC-DNS` with your actual EC2 public DNS or IP address.
 ## Part 7: Test API Endpoints
 
 ### Using Swagger UI
-1. Navigate to `http://YOUR-EC2-PUBLIC-DNS:8080/swagger`
+1. Navigate to `http://YOUR-EC2-PUBLIC-DNS:8081/swagger`
 2. Try the GET /api/orders endpoint
 3. Create an order using POST /api/orders
 
@@ -283,23 +283,23 @@ Replace `YOUR-EC2-PUBLIC-DNS` with your actual EC2 public DNS or IP address.
 
 ```bash
 # Get all orders
-curl http://YOUR-EC2-PUBLIC-DNS:8080/api/orders
+curl http://YOUR-EC2-PUBLIC-DNS:8081/api/orders
 
 # Create an order
-curl -X POST http://YOUR-EC2-PUBLIC-DNS:8080/api/orders \
+curl -X POST http://YOUR-EC2-PUBLIC-DNS:8081/api/orders \
   -H "Content-Type: application/json" \
   -d '{"customerName":"John Doe","totalAmount":150.50}'
 
 # Get order by ID
-curl http://YOUR-EC2-PUBLIC-DNS:8080/api/orders/1
+curl http://YOUR-EC2-PUBLIC-DNS:8081/api/orders/1
 
 # Update order
-curl -X PUT http://YOUR-EC2-PUBLIC-DNS:8080/api/orders/1 \
+curl -X PUT http://YOUR-EC2-PUBLIC-DNS:8081/api/orders/1 \
   -H "Content-Type: application/json" \
   -d '{"customerName":"Jane Doe","totalAmount":200.00}'
 
 # Delete order
-curl -X DELETE http://YOUR-EC2-PUBLIC-DNS:8080/api/orders/1
+curl -X DELETE http://YOUR-EC2-PUBLIC-DNS:8081/api/orders/1
 ```
 
 ---
@@ -366,7 +366,7 @@ docker logs -t order-api-container
 **Symptoms:** API works locally on EC2 but not from browser
 
 **Solutions:**
-1. Check Security Group has port 8080 open to 0.0.0.0/0
+1. Check Security Group has port 8081 open to 0.0.0.0/0
 2. Verify containers are running: `docker ps`
 3. Check API is listening on all interfaces (0.0.0.0):
    ```bash
