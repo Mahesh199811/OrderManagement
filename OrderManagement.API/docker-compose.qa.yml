@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: qa-postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: OrderManagementDb_QA
+    ports:
+      - "5433:5432"
+    volumes:
+      - qa-postgres-data:/var/lib/postgresql/data
+    networks:
+      - qa-network
+    restart: always
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.qa
+    container_name: qa-order-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=QA
+      - ConnectionStrings__DefaultConnection=Host=postgres-db;Port=5432;Database=OrderManagementDb_QA;Username=postgres;Password=${DB_PASSWORD}
+    ports:
+      - "8082:8081"
+    depends_on:
+      - postgres-db
+    networks:
+      - qa-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  qa-postgres-data:
+
+networks:
+  qa-network:
+    driver: bridge

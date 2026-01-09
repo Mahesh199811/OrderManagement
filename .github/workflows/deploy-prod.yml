@@ -1,0 +1,100 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: Production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      
+      - name: Restore dependencies
+        run: |
+          cd OrderManagement.API
+          dotnet restore
+      
+      - name: Build
+        run: |
+          cd OrderManagement.API
+          dotnet build --configuration Release --no-restore
+      
+      - name: Run tests
+        run: |
+          cd OrderManagement.API
+          dotnet test --configuration Release --no-build --verbosity normal
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build Docker image
+        run: |
+          cd OrderManagement.API
+          docker build -f Dockerfile.prod -t order-management-api:latest .
+          docker tag order-management-api:latest order-management-api:${{ github.sha }}
+      
+      - name: Run security scan
+        run: |
+          echo "Running security scan"
+          # Add security scanning tools here (e.g., Snyk, Trivy)
+      
+      - name: Backup production database
+        env:
+          DB_HOST: ${{ secrets.PROD_DB_HOST }}
+          DB_NAME: ${{ secrets.PROD_DB_NAME }}
+          DB_USER: ${{ secrets.PROD_DB_USER }}
+          DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+        run: |
+          echo "Creating production database backup"
+          # Add backup commands here
+      
+      - name: Run database migrations
+        env:
+          DB_HOST: ${{ secrets.PROD_DB_HOST }}
+          DB_NAME: ${{ secrets.PROD_DB_NAME }}
+          DB_USER: ${{ secrets.PROD_DB_USER }}
+          DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+        run: |
+          echo "Running Production database migrations"
+          # Add migration commands here
+      
+      - name: Deploy to Production
+        env:
+          DB_HOST: ${{ secrets.PROD_DB_HOST }}
+          DB_NAME: ${{ secrets.PROD_DB_NAME }}
+          DB_USER: ${{ secrets.PROD_DB_USER }}
+          DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+        run: |
+          echo "Deploying to Production environment"
+          # Add your deployment commands here
+          # e.g., docker push, kubectl apply, AWS ECS update, etc.
+      
+      - name: Health check
+        run: |
+          echo "Performing production health check"
+          # Add health check commands here
+      
+      - name: Create release tag
+        if: success()
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag -a "v${{ github.run_number }}" -m "Production release ${{ github.run_number }}"
+          git push origin "v${{ github.run_number }}"
+      
+      - name: Notify deployment
+        if: always()
+        run: |
+          echo "Sending deployment notification"
+          # Add notification commands here (Slack, email, etc.)

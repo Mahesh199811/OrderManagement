@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:16-alpine
+    container_name: staging-postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: OrderManagementDb_Staging
+    ports:
+      - "5434:5432"
+    volumes:
+      - staging-postgres-data:/var/lib/postgresql/data
+    networks:
+      - staging-network
+    restart: always
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.staging
+    container_name: staging-order-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - ConnectionStrings__DefaultConnection=Host=postgres-db;Port=5432;Database=OrderManagementDb_Staging;Username=postgres;Password=${DB_PASSWORD}
+    ports:
+      - "8083:8081"
+    depends_on:
+      - postgres-db
+    networks:
+      - staging-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  staging-postgres-data:
+
+networks:
+  staging-network:
+    driver: bridge

@@ -6,3 +6,41 @@ obj/
 publish/
 *.dll
 *.pdb
+
+# Environment files - DO NOT COMMIT SENSITIVE DATA
+*.env
+.env.*
+!.env.example
+
+# Local development overrides
+appsettings.*.local.json
+appsettings.Local.json
+
+# Docker volumes
+postgres-data/
+dev-postgres-data/
+qa-postgres-data/
+staging-postgres-data/
+prod-postgres-data/
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Secrets and credentials
+secrets/
+credentials/
+*.pfx
+*.key
+*.pem

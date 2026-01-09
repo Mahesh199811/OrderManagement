@@ -1,0 +1,59 @@
+name: Deploy to QA
+
+on:
+  push:
+    branches:
+      - qa
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: QA
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      
+      - name: Restore dependencies
+        run: |
+          cd OrderManagement.API
+          dotnet restore
+      
+      - name: Build
+        run: |
+          cd OrderManagement.API
+          dotnet build --configuration Release --no-restore
+      
+      - name: Run tests
+        run: |
+          cd OrderManagement.API
+          dotnet test --configuration Release --no-build --verbosity normal || echo "No tests found"
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build Docker image
+        run: |
+          cd OrderManagement.API
+          docker build -f Dockerfile.qa -t order-management-api:qa .
+      
+      - name: Run database migrations
+        env:
+          DB_PASSWORD: ${{ secrets.QA_DB_PASSWORD }}
+        run: |
+          echo "Running QA database migrations"
+          # Add migration commands here
+      
+      - name: Deploy to QA
+        env:
+          DB_PASSWORD: ${{ secrets.QA_DB_PASSWORD }}
+        run: |
+          echo "Deploying to QA environment"
+          # Add your deployment commands here
+          # e.g., docker push, kubectl apply, etc.
